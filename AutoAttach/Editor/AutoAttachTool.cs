@@ -64,7 +64,7 @@ namespace Dythervin.AutoAttach.Editor
         static void OnCompile()
         {
             var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()
-                .Where(type => !type.IsInterface && !type.IsGenericTypeDefinition && !type.IsAbstract && !type.IsEnum && !type.IsPrimitive)).ToArray();
+                .Where(type => type.Instantiatable() && !type.IsEnum && !type.IsPrimitive)).ToArray();
 
 
             Setters.AddRange(allTypes.Where(type => type.ImplementsOrInherits(typeof(AutoSetter))).Select(type => (AutoSetter)Activator.CreateInstance(type)));
