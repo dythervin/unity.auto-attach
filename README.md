@@ -36,6 +36,6 @@ Examples:
         
         
         [AutoAdd] //Get component on current gameObject or add if not exist (similar to RequireComponent)
-        public NavMeshAgent agent;
+        public NavMeshAgent requiredAgent;
     }
 ```
