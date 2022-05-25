@@ -87,20 +87,25 @@ namespace Dythervin.AutoAttach.Editor
             AddSymbol();
         }
 
-        private static bool Fill(IReflect type, IDictionary<FieldInfo, AutoAttachAttribute> values)
+        private static bool Fill(Type type, IDictionary<FieldInfo, AutoAttachAttribute> values)
         {
-            foreach (FieldInfo fieldInfo in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            while (type != typeof(MonoBehaviour))
             {
-                if (fieldInfo.IsNotSerialized
-                    || fieldInfo.FieldType.IsValueType && !FindSetter(fieldInfo.FieldType, out _)
-                    || fieldInfo.IsPrivate && fieldInfo.GetCustomAttribute<SerializeField>() == null)
-                    continue;
+                foreach (FieldInfo fieldInfo in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                {
+                    if (fieldInfo.IsNotSerialized
+                        || fieldInfo.FieldType.IsValueType && !FindSetter(fieldInfo.FieldType, out _)
+                        || fieldInfo.IsPrivate && fieldInfo.GetCustomAttribute<SerializeField>() == null)
+                        continue;
 
-                var attribute = fieldInfo.GetCustomAttribute<AutoAttachAttribute>();
-                if (attribute == null)
-                    continue;
+                    var attribute = fieldInfo.GetCustomAttribute<AutoAttachAttribute>();
+                    if (attribute == null)
+                        continue;
 
-                values.Add(fieldInfo, attribute);
+                    values.Add(fieldInfo, attribute);
+                }
+
+                type = type.BaseType;
             }
 
             return values.Count > 0;
