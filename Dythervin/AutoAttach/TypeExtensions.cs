@@ -13,9 +13,10 @@ namespace Dythervin.AutoAttach
 
         public static bool TryGetBaseGeneric(this Type type, out Type baseGenericType)
         {
+            baseGenericType = type;
             do
             {
-                baseGenericType = type.BaseType;
+                baseGenericType = baseGenericType.BaseType;
                 if (baseGenericType == null)
                     return false;
             } while (!baseGenericType.IsGenericType);

@@ -15,7 +15,7 @@ namespace Dythervin.AutoAttach.Editor.Setters
             return value.IsClass && !value.ImplementsOrInherits(typeof(ICollection));
         }
 
-        public override bool TrySetField(Component target, FieldInfo fieldInfo, AutoAttachAttribute attribute)
+        public override bool TrySetField(Component target, FieldInfo fieldInfo, AttachAttribute attribute)
         {
             if (fieldInfo.FieldType.ImplementsOrInherits(typeof(Object)))
             {
@@ -26,24 +26,26 @@ namespace Dythervin.AutoAttach.Editor.Setters
             else if (fieldInfo.GetValue(target) != null)
                 return false;
 
-            Component value = GetComponent(target.gameObject, fieldInfo.FieldType, attribute);
+            Object value = GetComponent(target.gameObject, fieldInfo.FieldType, attribute);
             fieldInfo.SetValue(target, value);
             return true;
         }
 
-        private static Component GetComponent(GameObject target, Type type, AutoAttachAttribute attribute)
+        private static Object GetComponent(GameObject target, Type type, AttachAttribute attribute)
         {
             switch (attribute.type)
             {
-                case AutoAttachType.Children:
+                case Attach.Children:
                     return target.GetComponentInChildren(type);
-                case AutoAttachType.Parent:
+                case Attach.Parent:
                     return target.GetComponentInParent(type);
+                case Attach.Scene:
+                    return Object.FindObjectOfType(type);
 
-                case AutoAttachType.Default:
+                case Attach.Default:
                 default:
                     Component value = target.GetComponent(type);
-                    if (attribute is AutoAddAttribute && !value)
+                    if (attribute is AttachOrAddAttribute && !value)
                         value = target.gameObject.AddComponent(type);
 
                     return value;

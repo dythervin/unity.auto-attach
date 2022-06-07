@@ -5,7 +5,7 @@ namespace Dythervin.AutoAttach.Demo
 {
     public class AutoAttachDemoChild : MonoBehaviour
     {
-        [AutoAttach(AutoAttachType.Parent)]
+        [Attach(Attach.Parent)]
         public NavMeshAgent agent;
     }
 }

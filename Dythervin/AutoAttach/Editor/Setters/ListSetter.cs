@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Dythervin.AutoAttach.Editor.Setters
 {
@@ -15,7 +17,8 @@ namespace Dythervin.AutoAttach.Editor.Setters
             return value.ImplementsOrInherits(typeof(IList));
         }
 
-        public override bool TrySetField(Component target, FieldInfo fieldInfo, AutoAttachAttribute attribute)
+        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
+        public override bool TrySetField(Component target, FieldInfo fieldInfo, AttachAttribute attribute)
         {
             bool setValue;
             IList list = (IList)fieldInfo.GetValue(target);
@@ -30,23 +33,24 @@ namespace Dythervin.AutoAttach.Editor.Setters
 
             Type listType = fieldInfo.FieldType;
 
-            while (listType.IsGenericTypeDefinition && listType.GetGenericTypeDefinition() != typeof(List<>))
+            while (!listType.IsGenericType)
             {
                 listType.TryGetBaseGeneric(out listType);
             }
 
             Type elementType = listType.GenericTypeArguments[0];
 
-            var array = attribute.type switch
+            IReadOnlyList<Object> array = attribute.type switch
             {
-                AutoAttachType.Children => target.GetComponentsInChildren(elementType),
-                AutoAttachType.Parent => target.GetComponentsInParent(elementType),
+                Attach.Children => target.GetComponentsInChildren(elementType),
+                Attach.Parent => target.GetComponentsInParent(elementType),
+                Attach.Scene => Object.FindObjectsOfType(elementType),
                 _ => target.GetComponents(elementType)
             };
             bool newValues = false;
-            for (int i = 0; i < array.Length; i++)
+            for (int i = 0; i < array.Count; i++)
             {
-                Component component = array[i];
+                Object component = array[i];
                 if (list.Count > i)
                 {
                     if (ReferenceEquals(list[i], component))

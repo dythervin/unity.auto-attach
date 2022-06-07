@@ -6,18 +6,18 @@ namespace Dythervin.AutoAttach.Demo
 {
     public class AutoAttachDemo : MonoBehaviour
     {
-        [AutoAdd]
+        [AttachOrAdd]
         public NavMeshAgent agent;
 
-        [AutoAttach(AutoAttachType.Children)]
+        [Attach(Attach.Children, false)]
         [SerializeField]
         private Renderer[] rendererArray;
 
-        [AutoAttach(AutoAttachType.Children)]
+        [Attach(Attach.Children)]
         [SerializeField]
         private List<Collider> rendererList;
         
-        [AutoAttach(AutoAttachType.Children)]
+        [Attach(Attach.Children)]
         [SerializeField]
         private List<MeshFilter> meshFilterList;
     }

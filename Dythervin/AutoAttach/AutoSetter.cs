@@ -8,6 +8,6 @@ namespace Dythervin.AutoAttach
     {
         public abstract bool Compatible(Type value);
         public virtual int Order => 0;
-        public abstract bool TrySetField(Component target, FieldInfo fieldInfo, AutoAttachAttribute attribute);
+        public abstract bool TrySetField(Component target, FieldInfo fieldInfo, AttachAttribute attribute);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dythervin.Utils;
 using UnityEditor;
 using UnityEditor.EditorTools;
 using UnityEngine;
@@ -12,8 +13,7 @@ namespace Dythervin.AutoAttach.Editor
     [EditorTool(nameof(AutoAttachTool), typeof(MonoBehaviour))]
     internal class AutoAttachTool : EditorTool
     {
-        private static readonly Dictionary<Type, Dictionary<FieldInfo, AutoAttachAttribute>> Cache =
-            new Dictionary<Type, Dictionary<FieldInfo, AutoAttachAttribute>>();
+        private static readonly Dictionary<Type, Dictionary<FieldInfo, AttachAttribute>> Cache = new Dictionary<Type, Dictionary<FieldInfo, AttachAttribute>>();
 
         private static readonly List<AutoSetter> Setters = new List<AutoSetter>();
 
@@ -49,16 +49,6 @@ namespace Dythervin.AutoAttach.Editor
                 Set((MonoBehaviour)o);
         }
 
-        private static void AddSymbol()
-        {
-            const string define = "AUTO_ATTACH";
-            string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-            if (defines.Contains(define))
-                return;
-
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, $"{defines};{define}");
-        }
-
 
         [UnityEditor.Callbacks.DidReloadScripts]
         static void OnCompile()
@@ -70,12 +60,12 @@ namespace Dythervin.AutoAttach.Editor
             Setters.AddRange(allTypes.Where(type => type.ImplementsOrInherits(typeof(AutoSetter))).Select(type => (AutoSetter)Activator.CreateInstance(type)));
             Setters.Sort((a, b) => a.Order.CompareTo(b.Order));
 
-            Dictionary<FieldInfo, AutoAttachAttribute> values = null;
+            Dictionary<FieldInfo, AttachAttribute> values = null;
             foreach (Type type in allTypes)
             {
                 if (type.ImplementsOrInherits(typeof(MonoBehaviour)))
                 {
-                    values ??= new Dictionary<FieldInfo, AutoAttachAttribute>();
+                    values ??= new Dictionary<FieldInfo, AttachAttribute>();
                     if (!Fill(type, values))
                         continue;
 
@@ -84,10 +74,10 @@ namespace Dythervin.AutoAttach.Editor
                 }
             }
 
-            AddSymbol();
+            Symbols.AddSymbol("AUTO_ATTACH");
         }
 
-        private static bool Fill(Type type, IDictionary<FieldInfo, AutoAttachAttribute> values)
+        private static bool Fill(Type type, IDictionary<FieldInfo, AttachAttribute> values)
         {
             while (type != typeof(MonoBehaviour))
             {
@@ -98,11 +88,19 @@ namespace Dythervin.AutoAttach.Editor
                         || fieldInfo.IsPrivate && fieldInfo.GetCustomAttribute<SerializeField>() == null)
                         continue;
 
-                    var attribute = fieldInfo.GetCustomAttribute<AutoAttachAttribute>();
-                    if (attribute == null)
-                        continue;
-
-                    values.Add(fieldInfo, attribute);
+                    try
+                    {
+                        fieldInfo.GetCustomAttributes<AttachAttribute>();
+                        var attribute = fieldInfo.GetCustomAttribute<AttachAttribute>();
+                        if (attribute == null)
+                            continue;
+                        values.Add(fieldInfo, attribute);
+                    }
+                    
+                    catch (AmbiguousMatchException)
+                    {
+                        Debug.LogError($"{type} {fieldInfo.Name} has multiple Attach Attributes");
+                    }
                 }
 
                 type = type.BaseType;

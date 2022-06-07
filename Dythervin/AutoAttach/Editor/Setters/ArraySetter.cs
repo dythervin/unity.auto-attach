@@ -1,37 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Dythervin.AutoAttach.Editor.Setters
 {
     public class ArraySetter : AutoSetter
     {
         public override int Order => -100;
+
         public override bool Compatible(Type value)
         {
             return value.IsArray;
         }
 
-        public override bool TrySetField(Component target, FieldInfo fieldInfo, AutoAttachAttribute attribute)
+        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
+        public override bool TrySetField(Component target, FieldInfo fieldInfo, AttachAttribute attribute)
         {
             Type elementType = fieldInfo.FieldType.GetElementType();
-            var componentArray = attribute.type switch
+            IReadOnlyList<Object> componentArray = attribute.type switch
             {
-                AutoAttachType.Children => target.GetComponentsInChildren(elementType),
-                AutoAttachType.Parent => target.GetComponentsInParent(elementType),
+                Attach.Children => target.GetComponentsInChildren(elementType),
+                Attach.Parent => target.GetComponentsInParent(elementType),
+                Attach.Scene => Object.FindObjectsOfType(elementType),
                 _ => target.GetComponents(elementType)
             };
 
-            var prevArray = (Array)fieldInfo.GetValue(target);
-
-
-            var array = prevArray != null && prevArray.Length == componentArray.Length
+            Array prevArray = (Array)fieldInfo.GetValue(target);
+            
+            Array array = prevArray != null && prevArray.Length == componentArray.Count
                 ? prevArray
-                : Array.CreateInstance(elementType, componentArray.Length);
+                : Array.CreateInstance(elementType, componentArray.Count);
             bool newValues = false;
             for (int i = 0; i < array.Length; i++)
             {
-                Component value = componentArray[i];
+                Object value = componentArray[i];
                 if (ReferenceEquals(array.GetValue(i), value))
                     continue;
 
