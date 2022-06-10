@@ -1,7 +1,9 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dythervin.AutoAttach.Setters;
 using Dythervin.Utils;
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -15,7 +17,7 @@ namespace Dythervin.AutoAttach.Editor
     {
         private static readonly Dictionary<Type, Dictionary<FieldInfo, AttachAttribute>> Cache = new Dictionary<Type, Dictionary<FieldInfo, AttachAttribute>>();
 
-        private static readonly List<AutoSetter> Setters = new List<AutoSetter>();
+        private static readonly List<SetterBase> Setters = new List<SetterBase>();
 
         private const string EditorPrefsKey = "AutoAttachToolEnabled";
         private const string MenuItemName = "Tools/Dythervin/AutoAttach";
@@ -57,7 +59,7 @@ namespace Dythervin.AutoAttach.Editor
                 .Where(type => type.Instantiatable() && !type.IsEnum && !type.IsPrimitive)).ToArray();
 
 
-            Setters.AddRange(allTypes.Where(type => type.ImplementsOrInherits(typeof(AutoSetter))).Select(type => (AutoSetter)Activator.CreateInstance(type)));
+            Setters.AddRange(allTypes.Where(type => type.ImplementsOrInherits(typeof(SetterBase))).Select(type => (SetterBase)Activator.CreateInstance(type)));
             Setters.Sort((a, b) => a.Order.CompareTo(b.Order));
 
             Dictionary<FieldInfo, AttachAttribute> values = null;
@@ -96,7 +98,7 @@ namespace Dythervin.AutoAttach.Editor
                             continue;
                         values.Add(fieldInfo, attribute);
                     }
-                    
+
                     catch (AmbiguousMatchException)
                     {
                         Debug.LogError($"{type} {fieldInfo.Name} has multiple Attach Attributes");
@@ -122,7 +124,7 @@ namespace Dythervin.AutoAttach.Editor
 
                 Type fieldType = fieldInfo.FieldType;
 
-                if (!FindSetter(fieldType, out AutoSetter setter))
+                if (!FindSetter(fieldType, out SetterBase setter))
                     continue;
 
                 if (setter.TrySetField(monoBehaviour, fieldInfo, data.Value))
@@ -135,9 +137,9 @@ namespace Dythervin.AutoAttach.Editor
             return set > 0;
         }
 
-        private static bool FindSetter(Type type, out AutoSetter setter)
+        private static bool FindSetter(Type type, out SetterBase setter)
         {
-            foreach (AutoSetter autoSetter in Setters)
+            foreach (SetterBase autoSetter in Setters)
             {
                 if (autoSetter.Compatible(type))
                 {
@@ -151,3 +153,4 @@ namespace Dythervin.AutoAttach.Editor
         }
     }
 }
+#endif

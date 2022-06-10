@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Dythervin.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Dythervin.AutoAttach.Editor.Setters
+namespace Dythervin.AutoAttach.Setters
 {
-    public class ListSetter : AutoSetter
+    public class ListSetter : SetterBase
     {
         public override int Order => -90;
 
@@ -34,19 +35,11 @@ namespace Dythervin.AutoAttach.Editor.Setters
             Type listType = fieldInfo.FieldType;
 
             while (!listType.IsGenericType)
-            {
                 listType.TryGetBaseGeneric(out listType);
-            }
 
             Type elementType = listType.GenericTypeArguments[0];
 
-            IReadOnlyList<Object> array = attribute.type switch
-            {
-                Attach.Children => target.GetComponentsInChildren(elementType),
-                Attach.Parent => target.GetComponentsInParent(elementType),
-                Attach.Scene => Object.FindObjectsOfType(elementType),
-                _ => target.GetComponents(elementType)
-            };
+            IReadOnlyList<Object> array = GetComponents(target, elementType, attribute.type);
             bool newValues = false;
             for (int i = 0; i < array.Count; i++)
             {

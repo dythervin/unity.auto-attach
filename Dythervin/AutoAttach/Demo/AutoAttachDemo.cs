@@ -9,16 +9,22 @@ namespace Dythervin.AutoAttach.Demo
         [AttachOrAdd]
         public NavMeshAgent agent;
 
-        [Attach(Attach.Children, false)]
+        [Attach(Attach.Children)]
         [SerializeField]
         private Renderer[] rendererArray;
 
-        [Attach(Attach.Children)]
+        [Attach(Attach.Children, false)]
         [SerializeField]
         private List<Collider> rendererList;
-        
+
         [Attach(Attach.Children)]
         [SerializeField]
         private List<MeshFilter> meshFilterList;
+
+        [Attach(Attach.Scene)]
+        [SerializeField] private Camera anyCamera;
+
+        [Attach(Attach.Scene)]
+        [SerializeField] private Light[] allLights;
     }
 }

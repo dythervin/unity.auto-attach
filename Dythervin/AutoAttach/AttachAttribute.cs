@@ -1,28 +1,28 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Dythervin.AutoAttach
 {
-    public enum Attach : byte
-    {
-        Default = 0,
-        Children = 1,
-        Parent = 2,
-        Scene = 3
-    }
-
     [AttributeUsage(AttributeTargets.Field)]
     [Conditional("UNITY_EDITOR")]
     public class AttachAttribute : PropertyAttribute
     {
-        public readonly Attach type;
         public readonly bool readOnly;
+        public readonly Attach type;
+        private bool _initialized;
 
         public AttachAttribute(Attach type = Attach.Default, bool readOnly = true)
         {
             this.type = type;
             this.readOnly = readOnly;
         }
+    }
+
+    public class AttachOrAddAttribute : AttachAttribute
+    {
+        public AttachOrAddAttribute(bool readOnly = true) : base(readOnly: readOnly) { }
     }
 }

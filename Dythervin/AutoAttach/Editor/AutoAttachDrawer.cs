@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
-namespace Dythervin.AutoAttach
+namespace Dythervin.AutoAttach.Editor
 {
     [CustomPropertyDrawer(typeof(AttachAttribute), true)]
     public class AutoAttachDrawer : PropertyDrawer
@@ -15,18 +16,11 @@ namespace Dythervin.AutoAttach
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            bool readOnly = Attribute.readOnly;
-            if (readOnly)
+            using (new EditorGUI.DisabledScope(Attribute.readOnly))
             {
-                EditorGUI.BeginDisabledGroup(true);
-            }
-
-            EditorGUI.PropertyField(position, property, label, true);
-
-            if (readOnly)
-            {
-                EditorGUI.EndDisabledGroup();
+                EditorGUI.PropertyField(position, property, label, true);
             }
         }
     }
 }
+#endif
