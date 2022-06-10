@@ -11,31 +11,41 @@ Examples:
 ```c#
     public class AutoAttachDemo : MonoBehaviour
     {
-        [AutoAttach] //Get component on current gameObject
+        [Attach] //Get component on current gameObject
         public NavMeshAgent agent;
         
-        [AutoAttach(AutoAttachType.Parent)] //Get component in parent gameObjects
+        [Attach(Attach.Parent)] //Get component in parent gameObjects
         public Collider colliderInParent;
         
-        [AutoAttach(AutoAttachType.Children)] //Get component in children gameObjects
+        [Attach(Attach.Children)] //Get component in children gameObjects
         [SerializeField]
         private Collider colliderInChildren;
+        
+        [Attach(Attach.Children, false)] //Get component in children gameObjects, can be changed in inspector
+        [SerializeField]
+        private Collider colliderInChildrenModifiable;
 
-        [AutoAttach(AutoAttachType.Children)] //Get components in children gameObjects
+        [Attach(Attach.Children)] //Get components in children gameObjects
         [SerializeField]
         private Renderer[] rendererArray;
 
-        [AutoAttach(AutoAttachType.Parent)] //Get components in parent gameObjects
+        [Attach(Attach.Parent)] //Get components in parent gameObjects
         [SerializeField]
         private List<Collider> colliderList;
         
-        [AutoAttach(AutoAttachType.Children)] //Get components in children gameObjects
+        [Attach(Attach.Children)] //Get components in children gameObjects
         [SerializeField]
         private List<MeshFilter> meshFilterList;
-        
-        
-        
-        [AutoAdd] //Get component on current gameObject or add if not exist (similar to RequireComponent)
+
+        [AttachOrAdd] //Get component on current gameObject or add if not exist (similar to RequireComponent)
         public NavMeshAgent requiredAgent;
+
+        [Attach(Attach.Scene)] //Get component in scene
+        [SerializeField] private Camera anyCamera;
+
+        [Attach(Attach.Scene)] //Get components in scene
+        [SerializeField] private Light[] allLights;
     }
 ```
+
+![preview](preview.png)
