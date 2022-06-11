@@ -17,15 +17,15 @@ Examples:
         [Attach(Attach.Parent)] //Get component in parent gameObjects
         public Collider colliderInParent;
         
-        [Attach(Attach.Children)] //Get component in children gameObjects
+        [Attach(Attach.Child)] //Get component in children gameObjects
         [SerializeField]
         private Collider colliderInChildren;
         
-        [Attach(Attach.Children, false)] //Get component in children gameObjects, can be changed in inspector
+        [Attach(Attach.Child, false)] //Get component in children gameObjects, can be changed in inspector
         [SerializeField]
         private Collider colliderInChildrenModifiable;
 
-        [Attach(Attach.Children)] //Get components in children gameObjects
+        [Attach(Attach.Child)] //Get components in children gameObjects
         [SerializeField]
         private Renderer[] rendererArray;
 
@@ -33,7 +33,7 @@ Examples:
         [SerializeField]
         private List<Collider> colliderList;
         
-        [Attach(Attach.Children)] //Get components in children gameObjects
+        [Attach(Attach.Child)] //Get components in children gameObjects
         [SerializeField]
         private List<MeshFilter> meshFilterList;
 
