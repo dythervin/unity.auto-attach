@@ -9,15 +9,15 @@ namespace Dythervin.AutoAttach.Demo
         [AttachOrAdd]
         public NavMeshAgent agent;
 
-        [Attach(Attach.Children)]
+        [Attach(Attach.Child)]
         [SerializeField]
         private Renderer[] rendererArray;
 
-        [Attach(Attach.Children, false)]
+        [Attach(Attach.Child, false)]
         [SerializeField]
         private List<Collider> rendererList;
 
-        [Attach(Attach.Children)]
+        [Attach(Attach.Child)]
         [SerializeField]
         private List<MeshFilter> meshFilterList;
 

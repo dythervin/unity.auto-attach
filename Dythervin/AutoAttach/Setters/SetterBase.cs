@@ -18,7 +18,7 @@ namespace Dythervin.AutoAttach.Setters
         {
             return attributeType switch
             {
-                Attach.Children => target.GetComponentsInChildren(elementType),
+                Attach.Child => target.GetComponentsInChildren(elementType),
                 Attach.Parent => target.GetComponentsInParent(elementType),
                 Attach.Scene => (IReadOnlyList<Object>)Object.FindObjectsOfType(elementType),
                 _ => target.GetComponents(elementType)
@@ -29,7 +29,7 @@ namespace Dythervin.AutoAttach.Setters
         {
             switch (attribute.type)
             {
-                case Attach.Children:
+                case Attach.Child:
                     return target.GetComponentInChildren(type);
                 case Attach.Parent:
                     return target.GetComponentInParent(type);
