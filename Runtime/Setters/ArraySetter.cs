@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -19,13 +20,14 @@ namespace Dythervin.AutoAttach.Setters
 
 
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        public override bool TrySetField(Component target, FieldInfo fieldInfo, AttachAttribute attribute)
+        public override bool TrySetField(Component target, object context, FieldInfo fieldInfo, AttachAttribute attribute)
         {
             Type elementType = fieldInfo.FieldType.GetElementType();
-            IReadOnlyList<Object> componentArray = GetComponents(target, elementType, attribute.type);
+            IReadOnlyList<Object> componentArray = GetComponents(target, elementType, attribute.Type);
+            Array prevArray = (Array)fieldInfo.GetValue(context);
 
-
-            Array prevArray = (Array)fieldInfo.GetValue(target);
+            if (!attribute.readOnly && prevArray != null && prevArray.Length > 0 && ((IReadOnlyList<object>)prevArray).Any(x => x != null))
+                return false;
 
             Array array = prevArray != null && prevArray.Length == componentArray.Count
                 ? prevArray
@@ -45,11 +47,10 @@ namespace Dythervin.AutoAttach.Setters
                 return false;
 
             if (prevArray != array)
-                fieldInfo.SetValue(target, array);
+                fieldInfo.SetValue(context, array);
 
             return true;
         }
-
     }
 }
 #endif

@@ -13,18 +13,12 @@ namespace Dythervin.AutoAttach.Demo
         [SerializeField]
         private Renderer[] rendererArray;
 
-        [Attach(Attach.Child, false)]
+        [Attach(Attach.Child)]
         [SerializeField]
         private List<Collider> rendererList;
-
+        
         [Attach(Attach.Child)]
         [SerializeField]
         private List<MeshFilter> meshFilterList;
-
-        [Attach(Attach.Scene)]
-        [SerializeField] private Camera anyCamera;
-
-        [Attach(Attach.Scene)]
-        [SerializeField] private Light[] allLights;
     }
 }

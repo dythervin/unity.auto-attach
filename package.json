@@ -1,0 +1,16 @@
+{
+  "name": "com.dythervin.unity.auto-attach",
+  "version": "1.0.0",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "keywords": [],
+  "author": {
+    "name": "Dythervin",
+    "email": "dythervin@gmail.com",
+    "url": "https://github.com/dythervin"
+  },
+  "dependencies": {
+    "com.dythervin.unity.core": "1.0.0"
+  },
+  "displayName": "auto-attach"
+}

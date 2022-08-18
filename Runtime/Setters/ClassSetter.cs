@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
-using Dythervin.Utils;
+using Dythervin.Core.Extensions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -16,21 +16,25 @@ namespace Dythervin.AutoAttach.Setters
             return value.IsClass && !value.ImplementsOrInherits(typeof(ICollection));
         }
 
-        public override bool TrySetField(Component target, FieldInfo fieldInfo, AttachAttribute attribute)
+        public override bool TrySetField(Component target, object context, FieldInfo fieldInfo, AttachAttribute attribute)
         {
-            if (fieldInfo.FieldType.ImplementsOrInherits(typeof(Object)))
+            if (!attribute.readOnly)
             {
-                var obj = (Object)fieldInfo.GetValue(target);
-                if (obj)
+                if (fieldInfo.FieldType.ImplementsOrInherits(typeof(Object)))
+                {
+                    var obj = (Object)fieldInfo.GetValue(context);
+                    if (obj)
+                        return false;
+                }
+                else if (fieldInfo.GetValue(context) != null)
+                {
                     return false;
-            }
-            else if (fieldInfo.GetValue(target) != null)
-            {
-                return false;
+                }
             }
 
             Object value = GetComponent(target, fieldInfo.FieldType, attribute);
-            fieldInfo.SetValue(target, value);
+            fieldInfo.SetValue(context, value);
+
             return true;
         }
     }

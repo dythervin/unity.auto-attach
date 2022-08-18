@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Dythervin.AutoAttach.Editor
@@ -23,4 +22,3 @@ namespace Dythervin.AutoAttach.Editor
         }
     }
 }
-#endif
