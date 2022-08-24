@@ -20,9 +20,9 @@ namespace Dythervin.AutoAttach.Editor
 
         private static readonly List<SetterBase> Setters = new List<SetterBase>();
 
-        public static int MaxDepth => 3;
-
         public static readonly EditorPrefBool IsEnabled = new EditorPrefBool(EditorPrefsKey, true);
+
+        public static int MaxDepth => 7;
 
 
         private void OnEnable()
@@ -31,7 +31,9 @@ namespace Dythervin.AutoAttach.Editor
                 return;
 
             foreach (Object o in targets)
+            {
                 Set((MonoBehaviour)o);
+            }
         }
 
         [MenuItem(MenuItemName)]
@@ -64,8 +66,12 @@ namespace Dythervin.AutoAttach.Editor
                 object context = data.GetContext(monoBehaviour);
 
                 data.attribute.BeforeSet(context);
-                if (setter.TrySetField(monoBehaviour, context, data.Field, data.attribute))
+                if (setter.TrySetField(monoBehaviour, context, data.Field.GetValue(context), data.Field.FieldType, data.attribute, out object newValue))
+                {
+                    data.Field.SetValue(context, newValue);
                     set++;
+                }
+
                 data.attribute.AfterSet(context);
             }
 

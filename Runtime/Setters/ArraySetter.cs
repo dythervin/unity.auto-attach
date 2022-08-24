@@ -1,9 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -20,14 +18,17 @@ namespace Dythervin.AutoAttach.Setters
 
 
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        public override bool TrySetField(Component target, object context, FieldInfo fieldInfo, AttachAttribute attribute)
+        public override bool TrySetField(Component target, object context, object currentValue, Type fieldType, AttachAttribute attribute, out object newValue)
         {
-            Type elementType = fieldInfo.FieldType.GetElementType();
-            IReadOnlyList<Object> componentArray = GetComponents(target, elementType, attribute.Type);
-            Array prevArray = (Array)fieldInfo.GetValue(context);
+            Type elementType = fieldType.GetElementType();
+            var componentArray = GetComponents(target, context, elementType, attribute);
+            var prevArray = (Array)currentValue;
 
-            if (!attribute.readOnly && prevArray != null && prevArray.Length > 0 && ((IReadOnlyList<object>)prevArray).Any(x => x != null))
+            if (!attribute.readOnly && prevArray != null && prevArray.Length > 0 && ((object[])prevArray).Any(x => x != null))
+            {
+                newValue = null;
                 return false;
+            }
 
             Array array = prevArray != null && prevArray.Length == componentArray.Count
                 ? prevArray
@@ -43,13 +44,8 @@ namespace Dythervin.AutoAttach.Setters
                 newValues = true;
             }
 
-            if (!newValues)
-                return false;
-
-            if (prevArray != array)
-                fieldInfo.SetValue(context, array);
-
-            return true;
+            newValue = array;
+            return newValues;
         }
     }
 }

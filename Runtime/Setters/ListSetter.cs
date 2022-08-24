@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using Dythervin.Core.Extensions;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -20,57 +19,51 @@ namespace Dythervin.AutoAttach.Setters
         }
 
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        public override bool TrySetField(Component target, object context, FieldInfo fieldInfo, AttachAttribute attribute)
+        public override bool TrySetField(Component target, object context, object currentValue, Type fieldType, AttachAttribute attribute, out object newValue)
         {
-            bool setValue;
-            IList list = (IList)fieldInfo.GetValue(context);
-
+            var list = (IList)currentValue;
 
             if (!attribute.readOnly && list != null && list.Count > 0 && ((IReadOnlyList<object>)list).Any(x => x != null))
+            {
+                newValue = null;
                 return false;
+            }
 
             if (list == null)
-            {
-                list = (IList)Activator.CreateInstance(fieldInfo.FieldType);
-                setValue = true;
-            }
-            else
-                setValue = false;
+                list = (IList)Activator.CreateInstance(fieldType);
 
-            Type listType = fieldInfo.FieldType;
+            newValue = list;
+
+            Type listType = fieldType;
 
             while (!listType.IsGenericType)
+            {
                 listType.TryGetBaseGeneric(out listType);
+            }
 
             Type elementType = listType.GenericTypeArguments[0];
 
-            IReadOnlyList<Object> array = GetComponents(target, elementType, attribute.Type);
+            var array = GetComponents(target, context, elementType, attribute);
             bool newValues = false;
             for (int i = 0; i < array.Count; i++)
             {
-                Object component = array[i];
+                Object value = array[i];
                 if (list.Count > i)
                 {
-                    if (ReferenceEquals(list[i], component))
+                    if (ReferenceEquals(list[i], value))
                         continue;
 
-                    newValues = true;
-                    list[i] = component;
+                    list[i] = value;
                 }
                 else
                 {
-                    list.Add(component);
-                    newValues = true;
+                    list.Add(value);
                 }
+
+                newValues = true;
             }
 
-            if (!newValues)
-                return false;
-
-            if (setValue)
-                fieldInfo.SetValue(context, list);
-
-            return true;
+            return newValues;
         }
     }
 }

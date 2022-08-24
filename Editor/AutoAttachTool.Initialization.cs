@@ -59,6 +59,7 @@ namespace Dythervin.AutoAttach.Editor
         private static bool Fill(IEnumerable<FieldInfo> buffer, Type context, FieldInfo fieldInfo, List<FieldData> values)
         {
             if (!fieldInfo.FieldType.IsValueType || FindSetter(fieldInfo.FieldType, out _))
+            {
                 try
                 {
                     var attribute = fieldInfo.GetCustomAttribute<AttachAttribute>();
@@ -77,6 +78,7 @@ namespace Dythervin.AutoAttach.Editor
                 {
                     Debug.LogError($"[{context}]\n{e}");
                 }
+            }
 
             return false;
         }
