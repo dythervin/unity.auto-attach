@@ -12,12 +12,12 @@ namespace Dythervin.AutoAttach.Setters
 
         public override bool Compatible(Type value)
         {
-            return value.IsClass && !value.ImplementsOrInherits(typeof(ICollection));
+            return value.IsClass && !value.Implements(typeof(ICollection));
         }
 
         public override bool TrySetField(Component target, object context, object currentValue, Type fieldType, AttachAttribute attribute, out object newValue)
         {
-            if (!attribute.readOnly && currentValue != null)
+            if (!attribute.isReadOnly && currentValue != null)
             {
                 if (currentValue is Object obj)
                 {
@@ -34,7 +34,7 @@ namespace Dythervin.AutoAttach.Setters
                 }
             }
 
-            newValue = GetComponent(target, context, fieldType, attribute);
+            newValue = SetterHelper.GetComponent(target, context, fieldType, attribute);
             return currentValue != newValue;
         }
     }

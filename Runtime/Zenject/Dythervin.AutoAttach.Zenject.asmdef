@@ -1,6 +1,6 @@
 {
     "name": "Dythervin.AutoAttach.Zenject",
-    "rootNamespace": "",
+    "rootNamespace": "Dythervin.AutoAttach.Zenject",
     "references": [
         "GUID:0d8beb7f090555447a6cf5ce9e54dbb4",
         "GUID:7afb353a1daa88e4797d2da07d684a54",

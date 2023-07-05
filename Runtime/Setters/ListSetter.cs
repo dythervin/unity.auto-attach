@@ -15,7 +15,7 @@ namespace Dythervin.AutoAttach.Setters
 
         public override bool Compatible(Type value)
         {
-            return value.ImplementsOrInherits(typeof(IList));
+            return value.Implements(typeof(IList));
         }
 
         [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
@@ -23,7 +23,7 @@ namespace Dythervin.AutoAttach.Setters
         {
             var list = (IList)currentValue;
 
-            if (!attribute.readOnly && list != null && list.Count > 0 && ((IReadOnlyList<object>)list).Any(x => x != null))
+            if (!attribute.isReadOnly && list != null && list.Count > 0 && ((IReadOnlyList<object>)list).Any(x => x != null))
             {
                 newValue = null;
                 return false;
@@ -43,7 +43,7 @@ namespace Dythervin.AutoAttach.Setters
 
             Type elementType = listType.GenericTypeArguments[0];
 
-            var array = GetComponents(target, context, elementType, attribute);
+            var array = SetterHelper.GetComponents(target, context, elementType, attribute);
             bool newValues = false;
             for (int i = 0; i < array.Count; i++)
             {

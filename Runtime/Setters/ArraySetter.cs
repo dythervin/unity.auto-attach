@@ -21,10 +21,10 @@ namespace Dythervin.AutoAttach.Setters
         public override bool TrySetField(Component target, object context, object currentValue, Type fieldType, AttachAttribute attribute, out object newValue)
         {
             Type elementType = fieldType.GetElementType();
-            var componentArray = GetComponents(target, context, elementType, attribute);
-            var prevArray = (Array)currentValue;
+            var componentArray = SetterHelper.GetComponents(target, context, elementType, attribute);
+            object[] prevArray = (object[])currentValue;
 
-            if (!attribute.readOnly && prevArray != null && prevArray.Length > 0 && ((object[])prevArray).Any(x => x != null))
+            if (!attribute.isReadOnly && prevArray != null && prevArray.Length > 0 && prevArray.Any(x => x != null))
             {
                 newValue = null;
                 return false;

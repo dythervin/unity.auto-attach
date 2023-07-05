@@ -15,7 +15,7 @@ namespace Dythervin.AutoAttach.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            using (new EditorGUI.DisabledScope(Attribute.readOnly))
+            using (new EditorGUI.DisabledScope(Attribute.isReadOnly && AutoAttachTool.IsEnabled))
             {
                 EditorGUI.PropertyField(position, property, label, true);
             }
